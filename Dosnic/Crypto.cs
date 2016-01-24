@@ -28,7 +28,7 @@ namespace Dosnic
             }
         }
 
-        public string Decrypy(string encryptedObject)
+        public string Decrypt(string encryptedObject)
         {
             if (Key == null || IV == null) throw new NullReferenceException("Key and IV must be non-null");
 

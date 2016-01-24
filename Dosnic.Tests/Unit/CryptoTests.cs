@@ -32,7 +32,7 @@ namespace Dosnic.Tests.Unit
         public void Should_encrypt_and_decrypt_object()
         {
             var encryptedOject = _crypto.Encrypt("ohh hai");
-            var decryptedObject = _crypto.Decrypy(encryptedOject);
+            var decryptedObject = _crypto.Decrypt(encryptedOject);
 
             decryptedObject.Should().BeEquivalentTo("ohh hai");
         }
