@@ -1,21 +1,22 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Dosnic
 {
-    public class Crypto : IDisposable
+    public class Crypto<T> : IDisposable
     {
         public string Key { get; protected internal set; }
         public string IV { get; protected internal set; }
         public SymmetricAlgorithm SymetricAlgo { get; protected internal set; }
 
-        public string Encrypt(string originalObject)
+        public string Encrypt(object originalObject)
         {
             if (Key == null || IV == null) throw new NullReferenceException("Key and IV must be non-null");
 
-            byte[] originalStrAsBytes = Encoding.Default.GetBytes(originalObject);
+            byte[] originalStrAsBytes = Encoding.Default.GetBytes(JsonConvert.SerializeObject(originalObject));
 
             using (MemoryStream memStream = new MemoryStream(originalStrAsBytes.Length))
             using (ICryptoTransform rdTranasform = SymetricAlgo.CreateEncryptor(Convert.FromBase64String(Key), Convert.FromBase64String(IV)))
@@ -28,7 +29,7 @@ namespace Dosnic
             }
         }
 
-        public string Decrypt(string encryptedObject)
+        public T Decrypt(string encryptedObject)
         {
             if (Key == null || IV == null) throw new NullReferenceException("Key and IV must be non-null");
 
@@ -38,7 +39,9 @@ namespace Dosnic
             using (ICryptoTransform rdTranasform = SymetricAlgo.CreateDecryptor(Convert.FromBase64String(Key), Convert.FromBase64String(IV)))
             using (CryptoStream cryptoStream = new CryptoStream(memStream, rdTranasform, CryptoStreamMode.Read))
             using (StreamReader sr = new StreamReader(cryptoStream, true))
-                return sr.ReadToEnd();
+            {
+                return JsonConvert.DeserializeObject<T>(sr.ReadToEnd());
+            }
         }
 
         public void Dispose()
