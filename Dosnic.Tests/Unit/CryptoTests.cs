@@ -36,5 +36,12 @@ namespace Dosnic.Tests.Unit
 
             decryptedObject.Should().BeEquivalentTo("ohh hai");
         }
+
+        [TestMethod]
+        public void Should_ctor_with_default_json_serializer()
+        {
+            _crypto.JsonSerializer.Should().BeOfType<Utils.JsonSerializer>();
+            _crypto.JsonSerializer.Should().NotBeNull();
+        }
     }
 }

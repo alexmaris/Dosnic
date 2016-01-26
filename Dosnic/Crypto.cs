@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Dosnic.Utils;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using NetJ = NetJSON.NetJSON;
 
 namespace Dosnic
 {
@@ -11,12 +11,18 @@ namespace Dosnic
         public string Key { get; protected internal set; }
         public string IV { get; protected internal set; }
         public SymmetricAlgorithm SymetricAlgo { get; protected internal set; }
+        public IJsonSerializer JsonSerializer { get; protected internal set; }
+
+        public Crypto(IJsonSerializer jsonSerializer)
+        {
+            JsonSerializer = jsonSerializer;
+        }
 
         public string Encrypt(object originalObject)
         {
             if (Key == null || IV == null) throw new NullReferenceException("Key and IV must be non-null");
 
-            byte[] originalStrAsBytes = Encoding.Default.GetBytes(NetJ.Serialize(originalObject));
+            byte[] originalStrAsBytes = Encoding.Default.GetBytes(JsonSerializer.Serialize(originalObject));
 
             using (MemoryStream memStream = new MemoryStream(originalStrAsBytes.Length))
             using (ICryptoTransform rdTranasform = SymetricAlgo.CreateEncryptor(Convert.FromBase64String(Key), Convert.FromBase64String(IV)))
@@ -40,7 +46,7 @@ namespace Dosnic
             using (CryptoStream cryptoStream = new CryptoStream(memStream, rdTranasform, CryptoStreamMode.Read))
             using (StreamReader sr = new StreamReader(cryptoStream, true))
             {
-                return NetJ.Deserialize<T>(sr.ReadToEnd());
+                return JsonSerializer.Deserialize<T>(sr.ReadToEnd());
             }
         }
 

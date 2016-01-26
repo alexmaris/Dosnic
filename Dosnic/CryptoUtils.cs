@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dosnic.Utils;
+using System;
 using System.Security.Cryptography;
 
 namespace Dosnic
@@ -8,7 +9,7 @@ namespace Dosnic
         public static Crypto<T> Initialize<T>(SymmetricAlgorithm symetricAlgorithm = null)
             where T: class
         {
-            var crypto = new Crypto<T>()
+            var crypto = new Crypto<T>(new JsonSerializer())
             {
                 Key = null,
                 IV = null,
